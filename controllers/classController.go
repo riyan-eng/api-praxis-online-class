@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
 )
 
@@ -15,8 +16,29 @@ import (
 // }
 
 func CreateClass(c *fiber.Ctx) error {
-	var class models.Class
-	c.BodyParser(&class)
+	class := new(models.Class)
+	if err := c.BodyParser(class); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+
+	if errorValidate := helpers.ValidateClass(*class); errorValidate != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    errorValidate,
+			"message": "fail",
+		})
+	}
+
+	// body := c.Bind(fiber.Map{class})
+	// fmt.Println(body)
+	// if err := validate.Struct(body); err != nil {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"data":    err.Error(),
+	// 		"message": "fail",
+	// 	})
+	// }
 	newClass := models.Class{
 		ClassName: class.ClassName,
 	}
