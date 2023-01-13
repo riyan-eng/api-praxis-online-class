@@ -17,6 +17,7 @@ func ConnectToDatabase() error {
 	if uri == "" {
 		return errors.New("you must set your 'MONGODB_URI' environmental variable")
 	}
+
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(uri))
 	if err != nil {
 		return err

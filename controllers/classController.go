@@ -1,24 +1,16 @@
 package controllers
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
 )
 
-// type Class struct {
-// 	ClassName       string `json:"class_name"`
-// 	ClassCode       string `json:"class_code"`
-// 	ClassMonthPrice int    `json:"class_month_price"`
-// 	IsActive        bool   `json:"is_active"`
-// }
-
 func CreateClass(c *fiber.Ctx) error {
 	class := new(models.Class)
-	class.ID = uuid.Must(uuid.NewRandom())
+	class.ID = uuid.New().String()
+	class.IsActive = true
 
 	// validate require body json
 	if err := c.BodyParser(class); err != nil {
@@ -36,9 +28,24 @@ func CreateClass(c *fiber.Ctx) error {
 		})
 	}
 
-	fmt.Println(class)
+	// insert to database
+	// collection := models.ClassCollection()
+	// collection.Indexes().CreateOne(
+	// 	context.Background(),
+	// 	mongo.IndexModel{
+	// 		Keys:    bson.D{{Key: "class_code", Value: 1}},
+	// 		Options: options.Index().SetUnique(true),
+	// 	},
+	// )
+	result, err := models.ClassCollection().InsertOne(c.Context(), class)
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data":    "create",
+		"data":    result,
 		"message": "ok",
 	})
 }
