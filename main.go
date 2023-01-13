@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/riyan-eng/api-praxis-online-class/initializers"
+	"github.com/riyan-eng/api-praxis-online-class/routes"
 )
 
 func init() {
@@ -41,12 +42,7 @@ func run() error {
 	// app.Get("/metrics", monitor.New(monitor.Config{Title: "MyService Metrics Page"}))
 
 	// route
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World 👋!")
-	})
-	app.Get("/a", func(c *fiber.Ctx) error {
-		panic("I'm an error")
-	})
+	routes.ClassGroup(app)
 
 	// start server
 	var port string
