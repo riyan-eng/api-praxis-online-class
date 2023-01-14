@@ -84,7 +84,7 @@ func ReadClass(c *fiber.Ctx) error {
 		})
 	} else if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
-			"data":    class,
+			"data":    err.Error(),
 			"message": "fail",
 		})
 	}
