@@ -7,6 +7,7 @@ import (
 	"github.com/riyan-eng/api-praxis-online-class/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CreateClass(c *fiber.Ctx) error {
@@ -96,8 +97,48 @@ func ReadClass(c *fiber.Ctx) error {
 }
 
 func UpdateClass(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	var class models.Class
+
+	// validate require body json
+	if err := c.BodyParser(&class); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+
+	// validate body json
+	if errorValidate := helpers.ValidateClass(class); errorValidate != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    errorValidate,
+			"message": "fail",
+		})
+	}
+
+	// access to database
+	filter := bson.M{"_id": id}
+	update := bson.M{
+		"class_name":        class.ClassName,
+		"class_code":        class.ClassCode,
+		"class_month_price": class.ClassMonthPrice,
+	}
+	// fmt.Println(class)
+
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+	}
+	err := models.ClassCollection().FindOneAndUpdate(c.Context(), filter, bson.M{"$set": update}, &opt).Decode(&class)
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data":    "update",
+		"data":    class,
 		"message": "ok",
 	})
 }
