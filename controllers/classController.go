@@ -11,12 +11,12 @@ import (
 )
 
 func CreateClass(c *fiber.Ctx) error {
-	class := new(models.Class)
+	var class models.Class
 	class.ID = uuid.New().String()
 	class.IsActive = true
 
 	// validate require body json
-	if err := c.BodyParser(class); err != nil {
+	if err := c.BodyParser(&class); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"data":    err.Error(),
 			"message": "fail",
@@ -24,7 +24,7 @@ func CreateClass(c *fiber.Ctx) error {
 	}
 
 	// validate body json
-	if errorValidate := helpers.ValidateClass(*class); errorValidate != nil {
+	if errorValidate := helpers.ValidateClass(class); errorValidate != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"data":    errorValidate,
 			"message": "fail",
@@ -98,7 +98,6 @@ func ReadClass(c *fiber.Ctx) error {
 
 func UpdateClass(c *fiber.Ctx) error {
 	id := c.Params("id")
-
 	var class models.Class
 
 	// validate require body json
@@ -124,7 +123,6 @@ func UpdateClass(c *fiber.Ctx) error {
 		"class_code":        class.ClassCode,
 		"class_month_price": class.ClassMonthPrice,
 	}
-	// fmt.Println(class)
 
 	after := options.After
 	opt := options.FindOneAndUpdateOptions{
