@@ -6,6 +6,7 @@ import (
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func CreateClass(c *fiber.Ctx) error {
@@ -72,8 +73,24 @@ func ReadClasses(c *fiber.Ctx) error {
 }
 
 func ReadClass(c *fiber.Ctx) error {
+	id := c.Params("id")
+	filter := bson.M{"_id": id}
+	var class models.Class
+	err := models.ClassCollection().FindOne(c.Context(), filter).Decode(&class)
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"data":    "record does not exists",
+			"message": "ok",
+		})
+	} else if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+			"data":    class,
+			"message": "fail",
+		})
+	}
+	// fmt.Println(class)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data":    "read",
+		"data":    class,
 		"message": "ok",
 	})
 }
