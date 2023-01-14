@@ -142,8 +142,19 @@ func UpdateClass(c *fiber.Ctx) error {
 }
 
 func DeleteClass(c *fiber.Ctx) error {
+	var class models.Class
+	id := c.Params("id")
+	filter := bson.M{"_id": id}
+
+	err := models.ClassCollection().FindOneAndDelete(c.Context(), filter).Decode(&class)
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data":    "delete",
+		"data":    class,
 		"message": "ok",
 	})
 }
