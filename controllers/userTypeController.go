@@ -7,6 +7,7 @@ import (
 	"github.com/riyan-eng/api-praxis-online-class/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CreateUserType(c *fiber.Ctx) error {
@@ -87,6 +88,51 @@ func ReadUserType(c *fiber.Ctx) error {
 		})
 	} else if err != nil {
 		return c.Status(fiber.ErrBadGateway.Code).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    userType,
+		"message": "ok",
+	})
+}
+
+func UpdateUserType(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var userType models.UserType
+
+	// validate parsing bodyjson
+	if err := c.BodyParser(&userType); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+
+	// validate body json
+	if errorValidate := helpers.ValidateUserType(userType); errorValidate != nil {
+		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    errorValidate,
+			"message": "fail",
+		})
+	}
+
+	// access to database
+	filter := bson.M{"_id": id}
+	update := bson.M{
+		"user_type_code": userType.UserTypeCode,
+		"user_type_name": userType.UserTypeName,
+	}
+
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+	}
+	err := models.UserTypeCollection().FindOneAndUpdate(c.Context(), filter, bson.M{"$set": update}, &opt).Decode(&userType)
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"data":    err.Error(),
 			"message": "fail",
 		})

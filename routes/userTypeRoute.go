@@ -10,6 +10,6 @@ func UserTypeGroup(app *fiber.App) {
 	UserTypeGroup.Get("/", controllers.ReadUserTypes)
 	UserTypeGroup.Get("/:id", controllers.ReadUserType)
 	UserTypeGroup.Post("/", controllers.CreateUserType)
-	// UserTypeGroup.Put("/:id", controllers.UpdateClass)
+	UserTypeGroup.Put("/:id", controllers.UpdateUserType)
 	// UserTypeGroup.Delete("/:id", controllers.DeleteClass)
 }
