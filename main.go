@@ -44,6 +44,7 @@ func run() error {
 	// route
 	routes.ClassGroup(app)
 	routes.UserTypeGroup(app)
+	routes.PaymentPeriodGroup(app)
 
 	// start server
 	var port string

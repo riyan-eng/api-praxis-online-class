@@ -6,11 +6,11 @@ import (
 )
 
 type PaymentPeriod struct {
-	ID         string  `bson:"_id" json:"id"`
-	PeriodCode string  `bson:"period_code" json:"period_code"`
-	PeriodName string  `bson:"period_name" json:"period_name"`
-	Discount   float32 `bson:"discount" json:"discount"`
-	IsActive   bool    `bson:"is_active" json:"is_active"`
+	ID         string `bson:"_id" json:"id"`
+	PeriodCode string `bson:"period_code" json:"period_code" validate:"required"`
+	PeriodName string `bson:"period_name" json:"period_name" validate:"required"`
+	Discount   uint16 `bson:"discount" json:"discount"`
+	IsActive   bool   `bson:"is_active" json:"is_active"`
 }
 
 func PaymentPeriodCollection() *mongo.Collection {
