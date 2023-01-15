@@ -6,6 +6,7 @@ import (
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func CreateUserType(c *fiber.Ctx) error {
@@ -67,6 +68,32 @@ func ReadUserTypes(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"data":    userTypes,
+		"message": "ok",
+	})
+}
+
+func ReadUserType(c *fiber.Ctx) error {
+	var (
+		id       = c.Params("id")
+		userType models.UserType
+	)
+
+	filter := bson.M{"_id": id}
+	err := models.UserTypeCollection().FindOne(c.Context(), filter).Decode(&userType)
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"data":    "record does not exists",
+			"message": "ok",
+		})
+	} else if err != nil {
+		return c.Status(fiber.ErrBadGateway.Code).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    userType,
 		"message": "ok",
 	})
 }

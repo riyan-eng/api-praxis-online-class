@@ -75,8 +75,8 @@ func ReadClasses(c *fiber.Ctx) error {
 
 func ReadClass(c *fiber.Ctx) error {
 	id := c.Params("id")
-	filter := bson.M{"_id": id}
 	var class models.Class
+	filter := bson.M{"_id": id}
 	err := models.ClassCollection().FindOne(c.Context(), filter).Decode(&class)
 	if err == mongo.ErrNoDocuments {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{

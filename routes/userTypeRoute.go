@@ -8,7 +8,7 @@ import (
 func UserTypeGroup(app *fiber.App) {
 	UserTypeGroup := app.Group("/user_type")
 	UserTypeGroup.Get("/", controllers.ReadUserTypes)
-	// UserTypeGroup.Get("/:id", controllers.ReadClass)
+	UserTypeGroup.Get("/:id", controllers.ReadUserType)
 	UserTypeGroup.Post("/", controllers.CreateUserType)
 	// UserTypeGroup.Put("/:id", controllers.UpdateClass)
 	// UserTypeGroup.Delete("/:id", controllers.DeleteClass)
