@@ -43,6 +43,7 @@ func run() error {
 
 	// route
 	routes.ClassGroup(app)
+	routes.UserTypeGroup(app)
 
 	// start server
 	var port string

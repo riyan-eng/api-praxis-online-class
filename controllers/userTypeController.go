@@ -4,6 +4,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
 )
 
@@ -23,7 +24,7 @@ func CreateUserType(c *fiber.Ctx) error {
 	}
 
 	// validate body json
-	if errorValidate := validate.Struct(userType); errorValidate != nil {
+	if errorValidate := helpers.ValidateUserType(userType); errorValidate != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"data":    errorValidate,
 			"message": "fail",
