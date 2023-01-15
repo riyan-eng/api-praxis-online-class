@@ -1,7 +1,10 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
 )
 
@@ -15,6 +18,16 @@ func CreatePaymentPeriod(c *fiber.Ctx) error {
 		})
 	}
 	// validate bodyjson
+	errValidation := helpers.ValidatePaymentPeriod(paymentPeriod)
+	if errValidation != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    errValidation,
+			"message": "fail",
+		})
+	}
+	// access to database
+	fmt.Println(paymentPeriod)
+	// models.PaymentPeriodCollection().InsertOne(c.Context(),paymentPeriod)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"data":    1,
 		"message": "ok",
