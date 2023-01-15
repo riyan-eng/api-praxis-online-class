@@ -143,3 +143,23 @@ func UpdateUserType(c *fiber.Ctx) error {
 		"message": "ok",
 	})
 }
+
+func DeleteUserType(c *fiber.Ctx) error {
+	id := c.Params("id")
+	var userType models.UserType
+
+	// access to database
+	filter := bson.M{"_id": id}
+	err := models.UserTypeCollection().FindOneAndDelete(c.Context(), filter).Decode(&userType)
+	if err != nil {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    userType,
+		"message": "ok",
+	})
+}
