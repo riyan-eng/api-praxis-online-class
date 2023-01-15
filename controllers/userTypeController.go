@@ -1,14 +1,12 @@
 package controllers
 
 import (
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
+	"go.mongodb.org/mongo-driver/bson"
 )
-
-var validate = validator.New()
 
 func CreateUserType(c *fiber.Ctx) error {
 	var userType models.UserType
@@ -32,7 +30,7 @@ func CreateUserType(c *fiber.Ctx) error {
 	}
 
 	// access to database
-	result, err := models.ClassCollection().InsertOne(c.Context(), userType)
+	result, err := models.UserTypeCollection().InsertOne(c.Context(), userType)
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"data":    err.Error(),
@@ -41,6 +39,34 @@ func CreateUserType(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"data":    result,
+		"message": "ok",
+	})
+}
+
+func ReadUserTypes(c *fiber.Ctx) error {
+	result, err := models.UserTypeCollection().Find(c.Context(), bson.M{})
+	if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+	defer result.Close(c.Context())
+
+	var userTypes []models.UserType
+	for result.Next(c.Context()) {
+		var userType models.UserType
+		if err = result.Decode(&userType); err != nil {
+			return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+				"data":    err.Error(),
+				"message": "fail",
+			})
+		}
+		userTypes = append(userTypes, userType)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    userTypes,
 		"message": "ok",
 	})
 }
