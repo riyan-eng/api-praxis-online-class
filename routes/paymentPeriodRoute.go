@@ -10,4 +10,5 @@ func PaymentPeriodGroup(app *fiber.App) {
 	paymentPeriodGroup.Post("/", controllers.CreatePaymentPeriod)
 	paymentPeriodGroup.Get("/", controllers.ReadPaymentPeriods)
 	paymentPeriodGroup.Get("/:id", controllers.ReadPaymentPeriod)
+	paymentPeriodGroup.Put("/:id", controllers.UpdatePaymentPeriod)
 }

@@ -6,6 +6,8 @@ import (
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CreatePaymentPeriod(c *fiber.Ctx) error {
@@ -87,13 +89,38 @@ func ReadPaymentPeriod(c *fiber.Ctx) error {
 	})
 }
 
-// func UpdatePaymentPeriod(c *fiber.Ctx) error {
-// 	var paymentPeriod models.PaymentPeriod
-// 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-// 		"data":    1,
-// 		"message": "ok",
-// 	})
-// }
+func UpdatePaymentPeriod(c *fiber.Ctx) error {
+	var paymentPeriod models.PaymentPeriod
+	var id = c.Params("id")
+
+	// access to database
+	filter := bson.M{"_id": id}
+	update := bson.M{
+		"period_code": "1",
+		"period_name": "1",
+		"discount":    1,
+	}
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+	}
+	err := models.PaymentPeriodCollection().FindOneAndUpdate(c.Context(), filter, bson.M{"$set": update}, &opt).Decode(&paymentPeriod)
+	if err == mongo.ErrNoDocuments {
+		c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+			"data":    "record does not exists",
+			"message": "fail",
+		})
+	} else if err != nil {
+		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    paymentPeriod,
+		"message": "ok",
+	})
+}
 
 // func DeletePaymentPeriod(c *fiber.Ctx) error {
 // 	var paymentPeriod models.PaymentPeriod
