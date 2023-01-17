@@ -143,10 +143,26 @@ func UpdatePaymentPeriod(c *fiber.Ctx) error {
 	})
 }
 
-// func DeletePaymentPeriod(c *fiber.Ctx) error {
-// 	var paymentPeriod models.PaymentPeriod
-// 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-// 		"data":    1,
-// 		"message": "ok",
-// 	})
-// }
+func DeletePaymentPeriod(c *fiber.Ctx) error {
+	var paymentPeriod models.PaymentPeriod
+	var id = c.Params("id")
+
+	// access to database
+	filter := bson.M{"_id": id}
+	err := models.PaymentPeriodCollection().FindOneAndDelete(c.Context(), filter).Decode(&paymentPeriod)
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    "recorn does not exists",
+			"message": "fail",
+		})
+	} else if err != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    paymentPeriod,
+		"message": "ok",
+	})
+}

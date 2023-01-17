@@ -11,4 +11,5 @@ func PaymentPeriodGroup(app *fiber.App) {
 	paymentPeriodGroup.Get("/", controllers.ReadPaymentPeriods)
 	paymentPeriodGroup.Get("/:id", controllers.ReadPaymentPeriod)
 	paymentPeriodGroup.Put("/:id", controllers.UpdatePaymentPeriod)
+	paymentPeriodGroup.Delete(":id", controllers.DeletePaymentPeriod)
 }
