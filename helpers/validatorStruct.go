@@ -57,3 +57,18 @@ func ValidatePaymentPeriod(user_type models.PaymentPeriod) []*ErrorResponse {
 	}
 	return errors
 }
+
+func ValidateUser(user models.User) []*ErrorResponse {
+	var errors []*ErrorResponse
+	err := validate.Struct(user)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			var element ErrorResponse
+			element.FailedField = err.StructNamespace()
+			element.Tag = err.Tag()
+			element.Value = err.Param()
+			errors = append(errors, &element)
+		}
+	}
+	return errors
+}
