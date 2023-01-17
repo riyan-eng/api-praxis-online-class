@@ -55,6 +55,8 @@ func ReadPaymentPeriods(c *fiber.Ctx) error {
 			"message": "fail",
 		})
 	}
+	defer result.Close(c.Context())
+
 	for result.Next(c.Context()) {
 		if err := result.Decode(&paymentPeriod); err != nil {
 			c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
