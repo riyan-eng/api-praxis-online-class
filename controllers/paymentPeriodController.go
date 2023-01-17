@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
@@ -100,19 +98,34 @@ func UpdatePaymentPeriod(c *fiber.Ctx) error {
 	var paymentPeriod models.PaymentPeriod
 	var id = c.Params("id")
 
+	// validate require bodyjson
+	if err := c.BodyParser(&paymentPeriod); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+
+	// validate bodyjson
+	if errValidation := helpers.ValidatePaymentPeriod(paymentPeriod); errValidation != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    errValidation,
+			"message": "fail",
+		})
+	}
+
 	// access to database
 	filter := bson.M{"_id": id}
 	update := bson.M{
-		"period_code": "1",
-		"period_name": "1",
-		"discount":    1,
+		"period_code": paymentPeriod.PeriodCode,
+		"period_name": paymentPeriod.PeriodName,
+		"discount":    paymentPeriod.Discount,
 	}
 	after := options.After
 	opt := options.FindOneAndUpdateOptions{
 		ReturnDocument: &after,
 	}
 	err := models.PaymentPeriodCollection().FindOneAndUpdate(c.Context(), filter, bson.M{"$set": update}, &opt).Decode(&paymentPeriod)
-	fmt.Println(err)
 	if err == mongo.ErrNoDocuments {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"data":    "record does not exists",
