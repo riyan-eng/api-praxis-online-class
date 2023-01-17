@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
@@ -105,13 +107,14 @@ func UpdatePaymentPeriod(c *fiber.Ctx) error {
 		ReturnDocument: &after,
 	}
 	err := models.PaymentPeriodCollection().FindOneAndUpdate(c.Context(), filter, bson.M{"$set": update}, &opt).Decode(&paymentPeriod)
+	fmt.Println(err)
 	if err == mongo.ErrNoDocuments {
-		c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"data":    "record does not exists",
 			"message": "fail",
 		})
 	} else if err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"data":    err.Error(),
 			"message": "fail",
 		})
