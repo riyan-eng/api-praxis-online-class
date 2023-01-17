@@ -8,4 +8,5 @@ import (
 func PaymentPeriodGroup(app *fiber.App) {
 	paymentPeriodGroup := app.Group("/payment_period")
 	paymentPeriodGroup.Post("/", controllers.CreatePaymentPeriod)
+	paymentPeriodGroup.Get("/", controllers.ReadPaymentPeriods)
 }

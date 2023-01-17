@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
@@ -45,6 +43,7 @@ func CreatePaymentPeriod(c *fiber.Ctx) error {
 
 func ReadPaymentPeriods(c *fiber.Ctx) error {
 	var paymentPeriod models.PaymentPeriod
+	var paymentPeriods []models.PaymentPeriod
 
 	// access to database
 	result, err := models.PaymentPeriodCollection().Find(c.Context(), bson.M{})
@@ -55,10 +54,16 @@ func ReadPaymentPeriods(c *fiber.Ctx) error {
 		})
 	}
 	for result.Next(c.Context()) {
-		fmt.Println(result.Decode(&paymentPeriod))
+		if err := result.Decode(&paymentPeriod); err != nil {
+			c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+				"data":    err.Error(),
+				"message": "fail",
+			})
+		}
+		paymentPeriods = append(paymentPeriods, paymentPeriod)
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data":    1,
+		"data":    paymentPeriods,
 		"message": "ok",
 	})
 }
