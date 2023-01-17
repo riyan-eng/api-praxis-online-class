@@ -17,9 +17,6 @@ func CreateUser(c *fiber.Ctx) error {
 	var class models.Class
 	var paymentPeriod models.PaymentPeriod
 
-	user.ID = uuid.New().String()
-	user.IsActive = true
-
 	// validate require bodyjson
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -78,7 +75,9 @@ func CreateUser(c *fiber.Ctx) error {
 		})
 	}
 
-	// declare bodyjson
+	// access to database
+	user.ID = uuid.New().String()
+	user.IsActive = true
 	user.UserTypeId = userType.ID
 	user.ClassId = class.ID
 	user.UniqueCode = uint16(rand.Intn(500))
