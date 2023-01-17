@@ -68,13 +68,24 @@ func ReadPaymentPeriods(c *fiber.Ctx) error {
 	})
 }
 
-// func ReadPaymentPeriod(c *fiber.Ctx) error {
-// 	var paymentPeriod models.PaymentPeriod
-// 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-// 		"data":    1,
-// 		"message": "ok",
-// 	})
-// }
+func ReadPaymentPeriod(c *fiber.Ctx) error {
+	var paymentPeriod models.PaymentPeriod
+	var id = c.Params("id")
+
+	// access to database
+	filter := bson.M{"_id": id}
+	err := models.PaymentPeriodCollection().FindOne(c.Context(), filter).Decode(&paymentPeriod)
+	if err != nil {
+		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    paymentPeriod,
+		"message": "ok",
+	})
+}
 
 // func UpdatePaymentPeriod(c *fiber.Ctx) error {
 // 	var paymentPeriod models.PaymentPeriod
