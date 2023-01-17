@@ -131,7 +131,12 @@ func UpdateUserType(c *fiber.Ctx) error {
 		ReturnDocument: &after,
 	}
 	err := models.UserTypeCollection().FindOneAndUpdate(c.Context(), filter, bson.M{"$set": update}, &opt).Decode(&userType)
-	if err != nil {
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    "record does not exists",
+			"message": "fail",
+		})
+	} else if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"data":    err.Error(),
 			"message": "fail",
@@ -151,7 +156,12 @@ func DeleteUserType(c *fiber.Ctx) error {
 	// access to database
 	filter := bson.M{"_id": id}
 	err := models.UserTypeCollection().FindOneAndDelete(c.Context(), filter).Decode(&userType)
-	if err != nil {
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    "record does not exists",
+			"message": "fail",
+		})
+	} else if err != nil {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"data":    err.Error(),
 			"message": "fail",

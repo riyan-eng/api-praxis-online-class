@@ -129,7 +129,12 @@ func UpdateClass(c *fiber.Ctx) error {
 		ReturnDocument: &after,
 	}
 	err := models.ClassCollection().FindOneAndUpdate(c.Context(), filter, bson.M{"$set": update}, &opt).Decode(&class)
-	if err != nil {
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    "record does not exists",
+			"message": "fail",
+		})
+	} else if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"data":    err.Error(),
 			"message": "fail",
@@ -147,7 +152,12 @@ func DeleteClass(c *fiber.Ctx) error {
 	filter := bson.M{"_id": id}
 
 	err := models.ClassCollection().FindOneAndDelete(c.Context(), filter).Decode(&class)
-	if err != nil {
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"data":    "record does not exists",
+			"message": "fail",
+		})
+	} else if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"data":    err.Error(),
 			"message": "fail",
