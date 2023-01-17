@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/riyan-eng/api-praxis-online-class/helpers"
 	"github.com/riyan-eng/api-praxis-online-class/models"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func CreatePaymentPeriod(c *fiber.Ctx) error {
@@ -40,13 +43,25 @@ func CreatePaymentPeriod(c *fiber.Ctx) error {
 	})
 }
 
-// func ReadPaymentPeriods(c *fiber.Ctx) error {
-// 	var paymentPeriod models.PaymentPeriod
-// 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-// 		"data":    1,
-// 		"message": "ok",
-// 	})
-// }
+func ReadPaymentPeriods(c *fiber.Ctx) error {
+	var paymentPeriod models.PaymentPeriod
+
+	// access to database
+	result, err := models.PaymentPeriodCollection().Find(c.Context(), bson.M{})
+	if err != nil {
+		c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"data":    err.Error(),
+			"message": "fail",
+		})
+	}
+	for result.Next(c.Context()) {
+		fmt.Println(result.Decode(&paymentPeriod))
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    1,
+		"message": "ok",
+	})
+}
 
 // func ReadPaymentPeriod(c *fiber.Ctx) error {
 // 	var paymentPeriod models.PaymentPeriod
