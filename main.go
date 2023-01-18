@@ -11,6 +11,7 @@ import (
 	"github.com/riyan-eng/api-praxis-online-class/routes"
 )
 
+// disable for production
 // func init() {
 // 	initializers.LoadEnvVariable()
 // }
