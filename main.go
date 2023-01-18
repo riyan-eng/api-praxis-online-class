@@ -11,9 +11,9 @@ import (
 	"github.com/riyan-eng/api-praxis-online-class/routes"
 )
 
-func init() {
-	initializers.LoadEnvVariable()
-}
+// func init() {
+// 	initializers.LoadEnvVariable()
+// }
 
 func main() {
 	err := run()
